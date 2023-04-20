@@ -1,0 +1,81 @@
+/// <summary>
+///   Represents a place of single item. It can be either occupied or empty.
+/// </summary>
+/// <typeparam name="TItem">The type of items supported.</typeparam>
+public class Maybe<TItem> : IEnumerable<TItem>
+{
+	private TItem[] maybeItem;
+
+	/// <summary>
+	///   Creates an instance of <see cref="Maybe{TItem}" />, which is empty.
+	/// </summary>
+	public Maybe()
+	{
+		maybeItem = Array.Empty<TItem>();
+	}
+
+	/// <summary>
+	///   Creates an instance of <see cref="Maybe{TItem}" />, which contains a specified item. If item is null, an empty maybe
+	///   is created.
+	/// </summary>
+	public Maybe(TItem item)
+	{
+		InsertItem(item);
+	}
+
+	/// <inheritdoc />
+	public IEnumerator<TItem> GetEnumerator()
+	{
+		return (IEnumerator<TItem>)maybeItem.GetEnumerator();
+	}
+
+	/// <inheritdoc />
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return maybeItem.GetEnumerator();
+	}
+
+	/// <summary>
+	///   Adds an item to an instance this class.
+	/// </summary>
+	/// <param name="item">The item to be added.</param>
+	/// <returns>True, if item was successfully added, false - otherwise.</returns>
+	/// <exception cref="InvalidOperationException">
+	///   If a not the same as existing item was attempted to be added, when there is
+	///   already an item present.
+	/// </exception>
+	public bool Add(TItem item)
+	{
+		if (maybeItem.Length <= 0)
+		{
+			bool wasInserted = InsertItem(item);
+			return wasInserted;
+		}
+
+		if (!maybeItem[0].Equals(item))
+		{
+			throw new InvalidOperationException("Cannot add more than 1 item into maybe monad.");
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	///   Makes the maybe instance empty (without items).
+	/// </summary>
+	public void Clear()
+	{
+		maybeItem = Array.Empty<TItem>();
+	}
+
+	private bool InsertItem(TItem item)
+	{
+		if (item == null)
+		{
+			return false;
+		}
+
+		maybeItem = new[] { item };
+		return true;
+	}
+}
